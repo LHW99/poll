@@ -7,21 +7,21 @@ from django.urls import reverse
 from .models import Question, Choice
 
 # Create your views here.
-def index(request):
-  latest_question_list = Question.objects.order_by('-pub_date')[:5]
-  template = loader.get_template('app_polls/index.html')
-  context = {'latest_question_list': latest_question_list,}
+class IndexView(generic.ListView):
+  template_name = 'app_polls/index.html'
+  context_object_name = 'latest_question_list'
 
-  return render(request, 'app_polls/index.html', context)
+  def get_queryset(self):
+    # returns last 5 published questions
+    return Question.objects.order_by('-pub_date')[:5]
 
-def detail(request, question_id):
-  question = get_object_or_404(Question, pk=question_id)
+class DetailView(generic.DetailView):
+  model = Question
+  template_name = 'app_polls/detail.html'
 
-  return render(request, 'app_polls/detail.html', {'question': question})
-
-def results(request, question_id):
-  question = get_object_or_404(Question, pk=question_id)
-  return render(request, 'app_polls/results.html', {'question': question})
+class ResultsView(generic.DetailView):
+  model = Question
+  template_name = 'app_polls/results.html'
 
 def vote(request, question_id):
   question = get_object_or_404(Question, pk=question_id)
